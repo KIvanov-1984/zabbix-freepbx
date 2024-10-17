@@ -283,7 +283,7 @@ if (isset($coreSettings['AsteriskVersion'])) {
     $asterisk['version'] = $coreSettings['AsteriskVersion'];
 }
 
-$asterisk['freepbx_version'] = getversion() ?? '';
+$asterisk['freepbx_version'] = getversion()?:'';
 
 $uptime_text = $Ami->send_request('Command', array('Command'=>'core show uptime seconds'));
 $uptime = text2Object($uptime_text['data']);
