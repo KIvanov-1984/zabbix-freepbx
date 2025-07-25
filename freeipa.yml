@@ -1,0 +1,1067 @@
+zabbix_export:
+  version: '7.0'
+  template_groups:
+    - uuid: 1d12408342854fd5a4436dd6d5d1bd4a
+      name: Templates/Telephony
+  templates:
+    - uuid: a566eb1cd5f04da2bad860422cbfd303
+      template: 'FreePBX by Zabbix Agent'
+      name: 'FreePBX by Zabbix Agent'
+      groups:
+        - name: Templates/Telephony
+      items:
+        - uuid: 3a3cb33dfbe24665a1b4005f13c9e9fb
+          name: 'FreePBX: Active calls'
+          type: DEPENDENT
+          key: freepbx.active_calls
+          delay: '0'
+          history: 7d
+          description: 'The number of active calls at the moment.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.active_calls
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: d0d8e4e8e24c4ff3af7fe9cd5416e8e0
+          name: 'FreePBX: Active channels'
+          type: DEPENDENT
+          key: freepbx.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The number of active channels at the moment.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.active_channels
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: d70678fea910477c8540a16d2b9b8722
+          name: 'FreePBX: Calls processed'
+          type: DEPENDENT
+          key: freepbx.calls_processed
+          delay: '0'
+          history: 7d
+          description: 'The number of calls processed after the last service restart.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.calls_processed
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 75ce8f95d1e243d29900a87f7b1d7c24
+          name: 'FreePBX: Calls processed per second'
+          type: DEPENDENT
+          key: freepbx.calls_processed.rate
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: 'The number of calls processed after the last service restart.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.calls_processed
+            - type: CHANGE_PER_SECOND
+              parameters:
+                - ''
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: a6466b4b81f1434e8257e4a69612b37d
+          name: 'FreePBX: FreePBX license'
+          type: DEPENDENT
+          key: freepbx.freepbx_license
+          delay: '0'
+          history: 7d
+          value_type: TEXT
+          trends: '0'
+          inventory_link: SOFTWARE_FULL
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.license_file
+            - type: TRIM
+              parameters:
+                - '[]'
+            - type: STR_REPLACE
+              parameters:
+                - ','
+                - \n
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: d6ec6fb6568c4b03a1b43b9f97905ad5
+          name: 'FreePBX: FreePBX Version'
+          type: DEPENDENT
+          key: freepbx.freepbx_version
+          delay: '0'
+          history: 7d
+          value_type: CHAR
+          trends: '0'
+          description: 'FreePBX version'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.freepbx_version
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+            - tag: Application
+              value: 'Dashboard Overview'
+        - uuid: 7045462312474036adbd30827db1d61b
+          name: 'FreePBX: Get stats'
+          key: freepbx.get_stats
+          history: '0'
+          value_type: TEXT
+          trends: '0'
+          description: 'Asterisk system information in JSON format.'
+          tags:
+            - tag: Application
+              value: 'Zabbix raw items'
+        - uuid: f0b6ba0ac02646dca3482132f22ee864
+          name: 'FreePBX: IAX trunks active channels'
+          type: DEPENDENT
+          key: freepbx.iax.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of IAX trunks active channels.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.active_channels
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: 624c8168da424b429ae2878f298e6e65
+              expression: 'min(/FreePBX by Zabbix Agent/freepbx.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
+              name: 'Asterisk: Total number of active channels of IAX trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"} for 10m)'
+              priority: AVERAGE
+              description: 'The IAX trunks may not be able to process new calls.'
+        - uuid: b655f9bebf1a46efa7ce77d1b309e359
+          name: 'FreePBX: IAX offline peers'
+          type: DEPENDENT
+          key: freepbx.iax.offline
+          delay: '0'
+          history: 7d
+          description: 'The number of offline IAX peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.offline
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 5025226b852343c4b1d0a3318af38c39
+          name: 'FreePBX: IAX online peers'
+          type: DEPENDENT
+          key: freepbx.iax.online
+          delay: '0'
+          history: 7d
+          description: 'The number of online IAX peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.online
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: fdf763d4b3b448b480d45283440f461a
+          name: 'FreePBX: IAX peers'
+          type: DEPENDENT
+          key: freepbx.iax.total
+          delay: '0'
+          history: 7d
+          description: 'The number of online IAX peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.total
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 34952155e0b64ddf87723d8e733677e7
+          name: 'FreePBX: IAX unmonitored peers'
+          type: DEPENDENT
+          key: freepbx.iax.unmonitored
+          delay: '0'
+          history: 7d
+          description: 'The number of unmonitored IAX peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.unmonitored
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: e088df7da07443f8b64aa9a0b6a50487
+          name: 'FreePBX: Mail queued'
+          type: DEPENDENT
+          key: freepbx.mail_queued
+          delay: '0'
+          history: 7d
+          description: 'Mail queued on the server, if using postfix.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.mail_queued
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: 29ff081b87ce4f89b5f55b3f408575c5
+              expression: 'last(/FreePBX by Zabbix Agent/freepbx.mail_queued)>=5'
+              name: 'Asterisk: mail broken'
+              priority: AVERAGE
+            - uuid: 74ef0bc8691343a2a73db5a665ef1d36
+              expression: 'last(/FreePBX by Zabbix Agent/freepbx.mail_queued)>=2'
+              name: 'Asterisk: Mail queued'
+              priority: WARNING
+        - uuid: 2628f7a30697451085904259301e0d38
+          name: 'FreePBX: PJSIP trunks active channels'
+          type: DEPENDENT
+          key: freepbx.pjsip.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of PJSIP trunks active channels.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.active_channels
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: b3cac02486ce4cc582851d9bdf2c2516
+              expression: 'min(/FreePBX by Zabbix Agent/freepbx.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
+              name: 'Asterisk: Total number of active channels of PJSIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"} for 10m)'
+              description: 'The PJSIP trunks may not be able to process new calls.'
+        - uuid: a66cdadcd89a4a688f05e0552d802d5a
+          name: 'FreePBX: PJSIP available endpoints'
+          type: DEPENDENT
+          key: freepbx.pjsip.available
+          delay: '0'
+          history: 7d
+          description: 'The number of available PJSIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.available
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 92bff18f4bc04124959322bfef7aefe0
+          name: 'FreePBX: PJSIP endpoints'
+          type: DEPENDENT
+          key: freepbx.pjsip.total
+          delay: '0'
+          history: 7d
+          description: 'The total number of PJSIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.total
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: eae688d88843483290c8bc0734b9645b
+          name: 'FreePBX: PJSIP unavailable endpoints'
+          type: DEPENDENT
+          key: freepbx.pjsip.unavailable
+          delay: '0'
+          history: 7d
+          description: 'The number of unavailable PJSIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.unavailable
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: a04a379e47bd42dfa90181f58a41d1e6
+          name: 'FreePBX: SIP trunks active channels'
+          type: DEPENDENT
+          key: freepbx.sip.active_channels
+          delay: '0'
+          history: 7d
+          description: 'The total number of SIP trunks active channels.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.active_channels
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: 786231cd37914a5aaf35d45e31e03190
+              expression: 'min(/FreePBX by Zabbix Agent/freepbx.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
+              name: 'Asterisk: Total number of active channels of SIP trunks is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"} for 10m)'
+              priority: WARNING
+              description: 'The SIP trunks may not be able to process new calls.'
+        - uuid: 2caf45f2c5ec478b9d76d3f1291ba00f
+          name: 'FreePBX: SIP monitored offline'
+          type: DEPENDENT
+          key: freepbx.sip.monitored_offline
+          delay: '0'
+          history: 7d
+          description: 'The number of monitored offline SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.monitored_offline
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: be5853747ffd420e9699c3376512150e
+          name: 'FreePBX: SIP monitored online'
+          type: DEPENDENT
+          key: freepbx.sip.monitored_online
+          delay: '0'
+          history: 7d
+          description: 'The number of monitored online SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.monitored_online
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: bc59254ba66f48e492c80c5d1965146f
+          name: 'FreePBX: SIP peers'
+          type: DEPENDENT
+          key: freepbx.sip.total
+          delay: '0'
+          history: 7d
+          description: 'The number of total SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.total
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 021855ec05184794837c95d0673ae2ef
+          name: 'FreePBX: SIP unmonitored offline'
+          type: DEPENDENT
+          key: freepbx.sip.unmonitored_offline
+          delay: '0'
+          history: 7d
+          description: 'The number of unmonitored offline SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.unmonitored_offline
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: 69e6ef2abdcc489f81b01615253524d8
+          name: 'FreePBX: SIP unmonitored online'
+          type: DEPENDENT
+          key: freepbx.sip.unmonitored_online
+          delay: '0'
+          history: 7d
+          description: 'The number of unmonitored online SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.unmonitored_online
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: f120fcfd0ec94a739d8ec61c3d1b571c
+          name: 'FreePBX: Total queues'
+          type: DEPENDENT
+          key: freepbx.total_queues
+          delay: '0'
+          history: 7d
+          description: 'The number of total SIP peers.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.queue.total
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+        - uuid: a7e00ea4b4d44cc390d5d9bb41a051d2
+          name: 'FreePBX: Uptime'
+          type: DEPENDENT
+          key: freepbx.uptime
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          description: 'System uptime in ''''N days, hh:mm:ss'''' format.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.uptime
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+            - tag: Application
+              value: 'Dashboard Overview'
+          triggers:
+            - uuid: 77cf8bdc1a2443a7abb2aa2866d05722
+              expression: 'nodata(/FreePBX by Zabbix Agent/freepbx.uptime,30m)=1'
+              name: 'Asterisk: Failed to fetch from AMI (or no data for 30m)'
+              priority: WARNING
+              description: 'Zabbix has not received data for items for the last 30 minutes.'
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Asterisk: Service is down'
+                  expression: 'last(/FreePBX by Zabbix Agent/proc.num[asterisk])=0'
+            - uuid: a9f2248220e64bada2822ef4507563fa
+              expression: 'last(/FreePBX by Zabbix Agent/freepbx.uptime)<10m'
+              name: 'Asterisk: has been restarted (uptime < 10m)'
+              priority: INFO
+              description: 'Uptime is less than 10 minutes'
+              manual_close: 'YES'
+        - uuid: 26aeebb315494e7eb580a1383ab87782
+          name: 'FreePBX: Uptime after reload'
+          type: DEPENDENT
+          key: freepbx.uptime_reload
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: uptime
+          description: 'System uptime after a config reload in ''''N days, hh:mm:ss'''' format.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.uptime_reload
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+            - tag: Application
+              value: 'Dashboard Overview'
+          triggers:
+            - uuid: eec28a6759254e888c5d58a6a838008d
+              expression: 'last(/FreePBX by Zabbix Agent/freepbx.uptime_reload)<10m'
+              name: 'Asterisk: has been reloaded (uptime < 10m)'
+              status: DISABLED
+              priority: INFO
+              manual_close: 'YES'
+        - uuid: 3b9a3c3d545542a39b58be729ee2644f
+          name: 'FreePBX: Asterisk Version'
+          type: DEPENDENT
+          key: freepbx.version
+          delay: '0'
+          history: 7d
+          value_type: CHAR
+          trends: '0'
+          description: 'System uptime in ''''N days, hh:mm:ss'''' format.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.version
+          master_item:
+            key: freepbx.get_stats
+          tags:
+            - tag: Application
+              value: Asterisk
+            - tag: Application
+              value: 'Dashboard Overview'
+          triggers:
+            - uuid: 65fa6634ab8f4a2daed177e1ffb9bac4
+              expression: '(last(/FreePBX by Zabbix Agent/freepbx.version,#1)<>last(/FreePBX by Zabbix Agent/freepbx.version,#2))=1 and length(last(/FreePBX by Zabbix Agent/freepbx.version))>0'
+              name: 'Asterisk: Version has changed (new version: {ITEM.VALUE})'
+              priority: INFO
+              description: 'Asterisk version has changed. Ack to close.'
+              manual_close: 'YES'
+        - uuid: d4e50cf29f84409a8c71873e1e952ac4
+          name: 'FreePBX: Service response time'
+          key: 'net.tcp.service.perf[tcp,127.0.0.1,5038]'
+          value_type: FLOAT
+          description: 'Asterisk Manager API performance.'
+          valuemap:
+            name: 'Service state'
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: 6965ab2e2d26495db658293cdcdeb41b
+              expression: 'min(/FreePBX by Zabbix Agent/net.tcp.service.perf[tcp,127.0.0.1,5038],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}'
+              name: 'Asterisk: Service response time is too high (over {$AMI.RESPONSE_TIME.MAX.WARN} for 5m)'
+              priority: WARNING
+              manual_close: 'YES'
+              dependencies:
+                - name: 'Asterisk: Service is down'
+                  expression: 'last(/FreePBX by Zabbix Agent/proc.num[asterisk])=0'
+        - uuid: 50ffc2f3e9a4451a9c40b034b9319981
+          name: 'FreePBX: Service status'
+          key: 'proc.num[asterisk]'
+          description: 'Asterisk Manager API port avalability.'
+          valuemap:
+            name: 'Service state'
+          preprocessing:
+            - type: IN_RANGE
+              parameters:
+                - '0'
+                - '1'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: UNKNOWN
+          tags:
+            - tag: Application
+              value: Asterisk
+          triggers:
+            - uuid: 97ad5acd42924d618634eabbe06f25cb
+              expression: 'last(/FreePBX by Zabbix Agent/proc.num[asterisk])=0'
+              name: 'Asterisk: Service is down'
+              priority: AVERAGE
+              manual_close: 'YES'
+      discovery_rules:
+        - uuid: ed08125fcbf4477381cd97f328c7bcba
+          name: 'FreePBX IAX peers discovery'
+          type: DEPENDENT
+          key: freepbx.iax_peers.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: 771e39949bb644c4bad8ab915147a82e
+              name: 'FreePBX IAX trunk "{#OBJECTNAME}": Active channels'
+              type: DEPENDENT
+              key: 'freepbx.iax.trunk.active_channels[{#OBJECTNAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of active IAX trunk channels.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.iax.trunks[?(@.ObjectName==''''{#OBJECTNAME}'''')].active_channels.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk IAX trunks'
+              trigger_prototypes:
+                - uuid: c85ebb4340ed4f609f28ee37200a6e4a
+                  expression: 'min(/FreePBX by Zabbix Agent/freepbx.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  name: 'IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  priority: WARNING
+                  description: 'The IAX trunk may not be able to process new calls.'
+            - uuid: f2c0035b656f409094ceb93f40573c61
+              name: 'FreePBX IAX trunk "{#OBJECTNAME}": Status'
+              type: DEPENDENT
+              key: 'freepbx.iax.trunk.status[{#OBJECTNAME}]'
+              delay: '0'
+              history: 7d
+              value_type: CHAR
+              trends: '0'
+              description: |
+                IAX trunk status. Here are the possible states that a device state may have:
+                Unmonitored
+                UNKNOWN
+                UNREACHABLE
+                OK
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.iax.trunks[?(@.ObjectName==''''{#OBJECTNAME}'''')].Status.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk IAX trunks'
+              trigger_prototypes:
+                - uuid: 9765d1237791473d9c287bff86bfa443
+                  expression: 'last(/FreePBX by Zabbix Agent/freepbx.iax.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/FreePBX by Zabbix Agent/freepbx.iax.trunk.status[{#OBJECTNAME}])="UNREACHABLE"'
+                  name: 'IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
+                  priority: AVERAGE
+                  description: 'The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
+          master_item:
+            key: freepbx.get_stats
+          lld_macro_paths:
+            - lld_macro: '{#OBJECTNAME}'
+              path: $.ObjectName
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.iax.trunks
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        - uuid: f0dcca7f2e4d4172a5abd25e200c67c9
+          name: 'FreePBX PJSIP endpoints discovery'
+          type: DEPENDENT
+          key: freepbx.pjsip_endpoints.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: 6b8bbbaf12c64ce8a99616d1a1bf1a5c
+              name: 'FreePBX PJSIP endpoint "{#OBJECTNAME}": Device state'
+              type: DEPENDENT
+              key: 'freepbx.pjsip.endpoint.devicestate[{#OBJECTNAME}]'
+              delay: '0'
+              value_type: CHAR
+              trends: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.pjsip.endpoints[?(@.ObjectName==''{#OBJECTNAME}'')].DeviceState.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'FreePBX PJSIP endpoints'
+              trigger_prototypes:
+                - uuid: 2743210dfed94647aca3669dd093d30b
+                  expression: 'last(/FreePBX by Zabbix Agent/freepbx.pjsip.endpoint.devicestate[{#OBJECTNAME}])="Unavailable"'
+                  name: 'Asterisk: PJSIP endpoint {#OBJECTNAME} unavailable'
+                  priority: WARNING
+          master_item:
+            key: freepbx.get_stats
+          lld_macro_paths:
+            - lld_macro: '{#OBJECTNAME}'
+              path: $.ObjectName
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.endpoints
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        - uuid: 124cc44c658f49ad8a053b66fc0193de
+          name: 'FreePBX PJSIP trunks discovery'
+          type: DEPENDENT
+          key: freepbx.pjsip_trunks.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: 1666bf847b744e5abba9de8a6bea96f3
+              name: 'FreePBX PJSIP trunk "{#OBJECTNAME}": Active channels'
+              type: DEPENDENT
+              key: 'freepbx.pjsip.trunk.active_channels[{#OBJECTNAME}]'
+              delay: '0'
+              history: 7d
+              description: 'The total number of active PJSIP trunk channels.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'FreePBX PJSIP trunks'
+              trigger_prototypes:
+                - uuid: c3a43f005e774c8283265f1384f04ecd
+                  expression: 'min(/FreePBX by Zabbix Agent/freepbx.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  name: 'PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  priority: WARNING
+                  description: 'The PJSIP trunk may not be able to process new calls.'
+            - uuid: e92b0f75c49140c5b2888e0b7f5fe0f8
+              name: 'FreePBX PJSIP trunk "{#OBJECTNAME}": Device state'
+              type: DEPENDENT
+              key: 'freepbx.pjsip.trunk.devicestate[{#OBJECTNAME}]'
+              delay: '0'
+              value_type: CHAR
+              trends: '0'
+              description: |
+                PJSIP trunk status. Here are the possible states that a device state may have:
+                Unavailable
+                Not in use
+                In use
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].DeviceState.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'FreePBX PJSIP trunks'
+              trigger_prototypes:
+                - uuid: fd3acb8b3fa843efbdbc29d169a67974
+                  expression: 'last(/FreePBX by Zabbix Agent/freepbx.pjsip.trunk.devicestate[{#OBJECTNAME}])="Unavailable"'
+                  name: 'PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable'
+                  description: 'The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.'
+          master_item:
+            key: freepbx.get_stats
+          lld_macro_paths:
+            - lld_macro: '{#OBJECTNAME}'
+              path: $.ObjectName
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pjsip.trunks
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        - uuid: d87e660032b14beb900f3c524c8619f2
+          name: 'FreePBX Queues discovery'
+          type: DEPENDENT
+          key: freepbx.queues.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: e0a1bfbac86a41198d630efd66d19c4e
+              name: 'FreePBX "{#QUEUE}": Available'
+              type: DEPENDENT
+              key: 'freepbx.queue.available[{#QUEUE}]'
+              delay: '0'
+              description: 'The number of available queue members.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.queue.queues[?(@.Queue==''''{#QUEUE}'''')].Available.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
+            - uuid: 159edea3f05446cab5f63b6986ac2100
+              name: 'FreePBX "{#QUEUE}": Callers'
+              type: DEPENDENT
+              key: 'freepbx.queue.callers[{#QUEUE}]'
+              delay: '0'
+              description: 'The number incoming calls in queue.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.queue.queues[?(@.Queue==''''{#QUEUE}'''')].Callers.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
+              trigger_prototypes:
+                - uuid: 28f8c6edcfdd4ca7acf2ec59b8ee4047
+                  expression: 'min(/FreePBX by Zabbix Agent/freepbx.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}'
+                  name: '"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high (over {$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"} for 10m)'
+                  priority: WARNING
+                  description: 'There is a large number of calls in the queue.'
+            - uuid: d64e40c061cf4a6e9c2fa9049bfb5aca
+              name: 'FreePBX "{#QUEUE}": Logged in'
+              type: DEPENDENT
+              key: 'freepbx.queue.loggedin[{#QUEUE}]'
+              delay: '0'
+              description: 'The number of queue members.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.queue.queues[?(@.Queue==''''{#QUEUE}'''')].LoggedIn.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk queue "{#QUEUE}"'
+          master_item:
+            key: freepbx.get_stats
+          lld_macro_paths:
+            - lld_macro: '{#QUEUE}'
+              path: $.Queue
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.queue.queues
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+        - uuid: a4d59c3d1e1846adadb77d349db80a64
+          name: 'FreePBX SIP peers discovery'
+          type: DEPENDENT
+          key: freepbx.sip_peers.discovery
+          delay: '0'
+          item_prototypes:
+            - uuid: 9f27d1ecf78f4ecbb7040e91ce787efb
+              name: 'FreePBX SIP trunk "{#OBJECTNAME}": Active channels'
+              type: DEPENDENT
+              key: 'freepbx.sip.trunk.active_channels[{#OBJECTNAME}]'
+              delay: '0'
+              description: 'The total number of active SIP trunk channels.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.sip.trunks[?(@.ObjectName==''''{#OBJECTNAME}'''')].active_channels.first()'
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk SIP trunks'
+              trigger_prototypes:
+                - uuid: 642b5cd41ef7442e9dfd2469308986a4
+                  expression: 'min(/FreePBX by Zabbix Agent/freepbx.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}'
+                  name: 'SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high (over {$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"} for 10m)'
+                  priority: WARNING
+                  description: 'The SIP trunk may not be able to process new calls.'
+            - uuid: 54d70980a2a54516a4b638a7c2611ad1
+              name: 'FreePBX SIP trunk "{#OBJECTNAME}": Status'
+              type: DEPENDENT
+              key: 'freepbx.sip.trunk.status[{#OBJECTNAME}]'
+              delay: '0'
+              description: |
+                SIP trunk status. Here are the possible states that a device state may have:
+                Unmonitored
+                UNKNOWN
+                UNREACHABLE
+                OK
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.sip.trunks[?(@.ObjectName==''''{#OBJECTNAME}'''')].Status.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: freepbx.get_stats
+              tags:
+                - tag: Application
+                  value: 'Asterisk SIP trunks'
+              trigger_prototypes:
+                - uuid: 7af5cc7b1be74ae9bcf4d7a2cf114f7a
+                  expression: 'last(/FreePBX by Zabbix Agent/freepbx.sip.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/FreePBX by Zabbix Agent/freepbx.sip.trunk.status[{#OBJECTNAME}])="UNREACHABLE"'
+                  name: 'SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE}'
+                  priority: AVERAGE
+          master_item:
+            key: freepbx.get_stats
+          lld_macro_paths:
+            - lld_macro: '{#OBJECTNAME}'
+              path: $.ObjectName
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.sip.trunks
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+      macros:
+        - macro: '{$AMI.QUEUE_CALLERS.MAX.WARN}'
+          value: '10'
+          description: 'The maximum number of callers in a queue for trigger expression.'
+        - macro: '{$AMI.RESPONSE_TIME.MAX.WARN}'
+          value: 10s
+          description: 'The Asterisk Manager API page maximum response time in seconds for trigger expression.'
+        - macro: '{$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN}'
+          value: '28'
+          description: 'The maximum number of busy channels of a trunk for trigger expression.'
+        - macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of IAX trunks for trigger expression.'
+        - macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of PJSIP trunks for trigger expression.'
+        - macro: '{$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}'
+          value: '28'
+          description: 'The total maximum number of busy channels of SIP trunks for trigger expression.'
+        - macro: '{$AMI.TRUNK_REGEXP}'
+          value: trunk
+          description: 'The regexp for the identification of trunk peers.'
+      dashboards:
+        - uuid: 410100a502274d6e97715cb7bd586d1d
+          name: 'Asterisk Dashboard'
+          pages:
+            - widgets:
+                - type: graph
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'FreePBX by Zabbix Agent'
+                        name: 'FreePBX: PJSIP peers'
+                    - type: STRING
+                      name: reference
+                      value: NIRBD
+                - type: graph
+                  'y': '5'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'FreePBX by Zabbix Agent'
+                        name: 'FreePBX: SIP peers'
+                    - type: STRING
+                      name: reference
+                      value: ZOAHO
+                - type: graph
+                  'y': '10'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'FreePBX by Zabbix Agent'
+                        name: 'FreePBX: IAX peers'
+                    - type: STRING
+                      name: reference
+                      value: EVKMP
+                - type: graph
+                  'y': '15'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'FreePBX by Zabbix Agent'
+                        name: 'FreePBX: Calls stats'
+                    - type: STRING
+                      name: reference
+                      value: KFMKG
+      valuemaps:
+        - uuid: 98a1dc9cafcc49c8a26f093a1257ba90
+          name: 'Service state'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
+  graphs:
+    - uuid: 7a031c7d6a1f4dd1b22985621237cbc2
+      name: 'FreePBX: Calls stats'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.active_channels
+        - sortorder: '1'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.active_calls
+        - sortorder: '2'
+          color: F63100
+          yaxisside: RIGHT
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.calls_processed.rate
+    - uuid: 1833dc94421a457e8b5acf451dbf9aa9
+      name: 'FreePBX: IAX peers'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.iax.active_channels
+        - sortorder: '1'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.iax.online
+        - sortorder: '2'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.iax.offline
+        - sortorder: '3'
+          color: A54F10
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.iax.unmonitored
+    - uuid: bc9e303797e74a42830c68954132a083
+      name: 'FreePBX: PJSIP peers'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.pjsip.active_channels
+        - sortorder: '1'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.pjsip.available
+        - sortorder: '2'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.pjsip.unavailable
+    - uuid: 997440c5e1ad49eb93c3da9404575f43
+      name: 'FreePBX: SIP peers'
+      graph_items:
+        - color: 1A7C11
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.sip.active_channels
+        - sortorder: '1'
+          color: 2774A4
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.sip.monitored_online
+        - sortorder: '2'
+          color: F63100
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.sip.monitored_offline
+        - sortorder: '3'
+          color: A54F10
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.sip.unmonitored_online
+        - sortorder: '4'
+          color: FC6EA3
+          calc_fnc: ALL
+          item:
+            host: 'FreePBX by Zabbix Agent'
+            key: freepbx.sip.unmonitored_offline
